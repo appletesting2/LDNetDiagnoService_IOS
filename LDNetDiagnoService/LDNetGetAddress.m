@@ -331,8 +331,13 @@
  */
 + (NETWORK_TYPE)getNetworkTypeFromStatusBar
 {
-    NSArray *subviews = [[[[UIApplication sharedApplication] valueForKey:@"statusBar"]
-        valueForKey:@"foregroundView"] subviews];
+    NSArray *subviews;
+    // 不能用 [[self deviceVersion] isEqualToString:@"iPhone X"] 来判断，因为模拟器不会返回 iPhone X
+    if ([[[UIApplication sharedApplication] valueForKeyPath:@"_statusBar"] isKindOfClass:NSClassFromString(@"UIStatusBar_Modern")]) {
+        subviews = [[[[[UIApplication sharedApplication] valueForKeyPath:@"_statusBar"] valueForKeyPath:@"_statusBar"] valueForKeyPath:@"foregroundView"] subviews];
+    } else {
+        subviews = [[[[UIApplication sharedApplication] valueForKeyPath:@"_statusBar"] valueForKeyPath:@"foregroundView"] subviews];
+    }
     NSNumber *dataNetworkItemView = nil;
     for (id subview in subviews) {
         if ([subview isKindOfClass:[NSClassFromString(@"UIStatusBarDataNetworkItemView") class]]) {
